@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  web:
+    restart: always
+    image: golang:1.14.9-stretch
+    ports:
+      - 8005:8005
+    links:
+      - mysql
+    environment:
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_PASS=${DB_PASS}
+      - SERVE_PORT=${SERVE_PORT}
+    volumes:
+      - ./:/go/src/github.com/ptflp/go-chi-rest
+    working_dir: /go/src/github.com/ptflp/go-chi-rest
+    command: go run ./cmd/web/main.go
+  
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - /mysql:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_NAME}

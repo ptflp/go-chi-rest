@@ -18,7 +18,7 @@ import (
 // NewPostHandler ...
 func NewPostHandler(db *database.DB) *PostsHandler {
 	return &PostsHandler{
-		service: post.NewPostService(db.Db),
+		service: post.NewPostService(db.DB),
 	}
 }
 
@@ -88,7 +88,12 @@ func (p *PostsHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 // respondwithJSON write json response format
 func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	fmt.Println(payload)
 	response, _ := json.Marshal(payload)
+	fmt.Println(string(response))
+	if response[0] == 110 {
+		response = []byte("[]")
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)

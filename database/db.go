@@ -8,11 +8,11 @@ import (
 )
 
 type DB struct {
-	Db *sqlx.DB
+	DB *sqlx.DB
 }
 
-// Connect ...
-func Connect(host, port, uname, pass, dbname string) (*DB, error) {
+// NewDatabase ...
+func NewDatabase(host, port, uname, pass, dbname string) (*DB, error) {
 	var db = &DB{}
 	dbSource := fmt.Sprintf(
 		"root:%s@tcp(%s:%s)/%s?charset=utf8",
@@ -22,7 +22,7 @@ func Connect(host, port, uname, pass, dbname string) (*DB, error) {
 		dbname,
 	)
 	d, err := sqlx.Connect("mysql", dbSource)
-	db.Db = d
+	db.DB = d
 
 	return db, err
 }

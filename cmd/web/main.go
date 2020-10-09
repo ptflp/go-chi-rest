@@ -23,17 +23,18 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 	servePort := os.Getenv("SERVE_PORT")
 
-	db, err := database.Connect(dbHost, dbPort, "root", dbPass, dbName)
+	db, err := database.NewDatabase(dbHost, dbPort, "root", dbPass, dbName)
 	if err != nil {
 		fmt.Println("database:", err)
 		os.Exit(-1)
 	}
 
+	postHandlers := handlers.NewPostHandler(db)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
-	postHandlers := handlers.NewPostHandler(db)
 	r.Route("/", func(r chi.Router) {
 		r.Route("/posts", func(r chi.Router) {
 			r.Get("/", postHandlers.Fetch)
@@ -45,7 +46,7 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", servePort),
+		Addr:    fmt.Sprintf(":%s", servePort),
 		Handler: r,
 	}
 

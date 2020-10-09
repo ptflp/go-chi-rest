@@ -2,6 +2,7 @@ package post
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ptflp/go-chi-rest/data"
@@ -30,24 +31,28 @@ func (m *postService) fetch(ctx context.Context, query string, args ...interface
 	payload := make([]*models.Post, 0)
 	for rows.Next() {
 		post := new(models.Post)
-
 		err := rows.Scan(
 			&post.ID,
 			&post.Title,
 			&post.Content,
 		)
+		fmt.Println(post)
 		if err != nil {
 			return nil, err
 		}
 		payload = append(payload, post)
 	}
+
 	return payload, nil
 }
 
-func (m *postService) Fetch(ctx context.Context, num int64) ([]*models.Post, error) {
-	query := "Select id, title, content From posts limit ?"
+func (m *postService) Fetch(ctx context.Context, num int64) ([]models.Post, error) {
+	query := "Select id, title, content From posts limit 5"
+	var pp []models.Post
+	err := m.db.Select(&pp, query)
 
-	return m.fetch(ctx, query, num)
+	fmt.Println(err, pp, num)
+	return pp, err
 }
 
 func (m *postService) GetByID(ctx context.Context, id int64) (*models.Post, error) {
